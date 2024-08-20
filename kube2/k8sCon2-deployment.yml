@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: k8scon2-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: k8scon2
+  template:
+    metadata:
+      labels:
+        app: k8scon2
+    spec:
+      containers:
+        - name: k8scon2
+          image: us-central1-docker.pkg.dev/genuine-haiku-417501/artifact/kube2:latest
+          ports:
+            - containerPort: 7070
+          volumeMounts:
+            - name: data-volume
+              mountPath: /shyamal_PV_dir
+          env:
+            - name: CONTAINER2_URL
+              value: http://k8scon2.default.svc.cluster.local:7070
+      volumes:
+          - name: data-volume
+            persistentVolumeClaim:
+              claimName: pvc

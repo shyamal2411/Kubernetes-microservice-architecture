@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: k8scon1
+spec:
+  type: LoadBalancer
+  selector:
+    app: k8scon1
+  ports:
+    - protocol: TCP
+      port: 6000
+      targetPort: 6000

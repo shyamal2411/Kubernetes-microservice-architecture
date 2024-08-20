@@ -1,0 +1,44 @@
+steps:
+  - name: "gcr.io/cloud-builders/docker"
+    script: |
+      docker build -t us-central1-docker.pkg.dev/genuine-haiku-417501/artifact/kube2:latest .
+      docker push us-central1-docker.pkg.dev/genuine-haiku-417501/artifact/kube2:latest
+
+  - name: "gcr.io/cloud-builders/gcloud"
+    args:
+      - "container"
+      - "clusters"
+      - "get-credentials"
+      - "kubernetes"
+      - "--zone=us-central1-c"
+      - "--project=genuine-haiku-417501"
+
+  - name: "gcr.io/cloud-builders/kubectl"
+    entrypoint: "bash"
+    args:
+      - "-c"
+      - |
+        if kubectl get pods -n default --output=jsonpath='{.items[*].metadata.name}' | grep -q 'k8sCon2'; then
+          echo "Deleting the kube-1-deployment pod"
+          kubectl delete -f k8sCon2-deployment.yml
+        else
+          echo "No pods running, applying changes"
+        fi
+  # - name: "gcr.io/cloud-builders/kubectl"
+  #   args: ["delete", "-f", "k8sCon2-deployment.yml", "-f", "k8sCon2-service.yml"]
+  #   env:
+  #     - "CLOUDSDK_COMPUTE_REGION=us-central1-c"
+  #     - "CLOUDSDK_COMPUTE_ZONE=us-central1-c"
+  #     - "CLOUDSDK_CONTAINER_CLUSTER=kubernetes"
+  #     - "PROJECT_ID=genuine-haiku-417501"
+
+  - name: "gcr.io/cloud-builders/kubectl"
+    args: ["apply", "-f", "k8sCon2-deployment.yml", "-f", "k8sCon2-service.yml"]
+    env:
+      - "CLOUDSDK_COMPUTE_REGION=us-central1-c"
+      - "CLOUDSDK_COMPUTE_ZONE=us-central1-c"
+      - "CLOUDSDK_CONTAINER_CLUSTER=kubernetes"
+      - "PROJECT_ID=genuine-haiku-417501"
+
+images:
+  - "us-central1-docker.pkg.dev/genuine-haiku-417501/artifact/kube2:latest"

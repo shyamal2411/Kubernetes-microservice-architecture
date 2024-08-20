@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: k8scon1-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: k8scon1
+  template:
+    metadata:
+      labels:
+        app: k8scon1
+    spec:
+      containers:
+        - name: k8scon1
+          image: us-central1-docker.pkg.dev/genuine-haiku-417501/artifact/kube1:latest
+          ports:
+            - containerPort: 6000
+          volumeMounts:
+            - name: data-volume
+              mountPath: /shyamal_PV_dir
+          env:
+            - name: CONTAINER2_URL
+              value: http://k8scon2.default.svc.cluster.local:7070
+      volumes:
+        - name: data-volume
+          persistentVolumeClaim:
+            claimName: pvc
+# apiVersion: apps/v1
+# kind: Deployment
+# metadata:
+#  name: k8scon1-deployment
+#  labels:
+#     app: k8scon1
+# spec:
+#  replicas: 1
+#  selector:
+#     matchLabels:
+#       app: k8scon1
+#  template:
+#     metadata:
+#       labels:
+#         app: k8scon1
+#     spec:
+#       containers:
+#         - name: k8scon1
+#           image: shyamal24/kube1:v1
+#           ports:
+#             - containerPort: 6000
+#           volumeMounts:
+#             - name: data-volume
+#               mountPath: /shyamal_PV_dir
+#           env:
+#             - name: CONTAINER2_URL
+#               value: http://k8scon2.default.svc.cluster.local:7070
+#       volumes:
+#         - name: data-volume
+#           persistentVolumeClaim:
+#             claimName: pvc
